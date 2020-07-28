@@ -45,9 +45,6 @@ import SmsLogin from 'react-native-sms-login'
 
 
 
-
-```
-
 ## Properties
 
 | Prop  | Default  | Type | isRequired | Description
