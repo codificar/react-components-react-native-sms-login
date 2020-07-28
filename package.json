@@ -1,0 +1,20 @@
+{
+  "name": "react-native-sms-login",
+  "version": "1.0.0",
+  "description": "A login using sms component for react native",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "\u0016git+https://github.com/codificar/react-native-sms-login"
+  },
+  "dependencies": {
+    "react-native-masked-text": "^1.9.2",
+    "react-native-i18n": "^2.0.10",
+    "axios": "^0.19.2"
+  },
+  "author": "Codificar",
+  "license": "MIT"
+}
