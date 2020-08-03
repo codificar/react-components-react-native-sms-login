@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "\u0016git+https://github.com/codificar/react-native-sms-login"
+    "url": "git+https://github.com/codificar/react-native-sms-login"
   },
   "dependencies": {
     "react-native-masked-text": "^1.9.2",
