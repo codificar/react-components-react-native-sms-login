@@ -19,6 +19,9 @@ class SmsLogin extends Component {
             routSendSecCode: this.props.routSendSecCode,
             showMaskPhone: this.props.showMaskPhone ? this.props.showMaskPhone : false,
 
+            countryArea: this.props.countryArea ? this.props.countryArea : '+55',
+            providerId: null,
+
             cellPhoneNumber: '',
             arrayCodeNumbers: [],
             arrayTexts: [],
@@ -49,29 +52,39 @@ class SmsLogin extends Component {
     cellphoneValidation() {
         if (this.state.cellPhoneNumber !== '') {
             this.setState({ isSendingCode: true })
-            let responseRequest = ''
-
+            let responseRequestSendSms = ''
+            let formattedNumberCell = this.state.cellPhoneNumber
+            formattedNumberCell = formattedNumberCell.replace("(", "").replace(")", "").replace("-", "").replace(/ /g, "")
+            formattedNumberCell = this.state.countryArea + formattedNumberCell
+            //console.log('formattedNumberCell: ', formattedNumberCell)
             if (this.props.routeSendNumber !== '') {
                 axios.get(this.props.routeSendNumber, {
                     params: {
-                        cellPhoneNumber: this.state.cellPhoneNumber
+                        phone: formattedNumberCell
                     }
                 }).then(response => {
-                    this.setState({ isSendingCode: false, showInputSecCode: true })
-                    responseRequest = response
-                    this.props.returnRequest(responseRequest)
+                    this.setState({ isSendingCode: false })
+                    responseRequestSendSms = response.data
+                    console.log('responseRequestSendSms: ', responseRequestSendSms)
+                    if (responseRequestSendSms.success == true && responseRequestSendSms.login == true) {
+                        this.setState({ showInputSecCode: true })
+                        //console.log('responseRequest.provider_id: ', responseRequestSendSms.provider_id)
+                        this.setState({ providerId: responseRequestSendSms.provider_id })
+                    }
+                    Object.assign(responseRequestSendSms, { cellPhoneNumber: formattedNumberCell })
+                    this.props.returnRequestSendSms(responseRequestSendSms)
                 }).catch(error => {
                     this.setState({ isSendingCode: false })
-                    responseRequest = error
-                    this.props.returnRequest(responseRequest)
+                    responseRequestSendSms = error
+                    this.props.returnRequestSendSms(responseRequestSendSms)
                 })
-            } else {
+            } /*else {
                 setTimeout(() => {
                     this.setState({ isSendingCode: false, showInputSecCode: true })
-                    responseRequest = 'Success send number request!'
-                    this.props.returnRequest(responseRequest)
+                    responseRequestSendSms = 'Success send number request!'
+                    this.props.returnRequestSendSms(responseRequestSendSms)
                 }, 3000)
-            }
+            }*/
 
         } else {
             this.setState({ emptyNumber: true })
@@ -82,29 +95,30 @@ class SmsLogin extends Component {
     validateCode() {
         this.setState({ isSendingCode: true })
         let stringSecurity = this.state.arrayTexts.join('')
-        let responseRequest = ''
-
+        let responseRequestValidateCode = ''
+        console.log('Parametros para o login sms: ', this.state.providerId, stringSecurity)
         if (this.props.routSendSecCode !== '') {
             axios.get(this.props.routSendSecCode, {
                 params: {
-                    securityCode: stringSecurity
+                    provider_id: this.state.providerId,
+                    code: stringSecurity
                 }
             }).then(response => {
                 this.setState({ isSendingCode: false })
-                responseRequest = response
-                this.props.returnRequest(responseRequest)
+                responseRequestValidateCode = response
+                this.props.returnRequestValidateCode(responseRequestValidateCode)
             }).catch(error => {
                 this.setState({ isSendingCode: false })
-                responseRequest = error
-                this.props.returnRequest(responseRequest)
+                responseRequestValidateCode = error
+                this.props.returnRequestValidateCode(responseRequestValidateCode)
             })
-        } else {
+        } /*else {
             setTimeout(() => {
                 this.setState({ isSendingCode: false, showInputSecCode: true })
-                responseRequest = 'Success validation request!'
-                this.props.returnRequest(responseRequest)
+                responseRequestValidateCode = 'Success validation request!'
+                this.props.returnRequestValidateCode(responseRequestValidateCode)
             }, 3000)
-        }
+        }*/
     }
 
 
