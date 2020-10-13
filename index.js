@@ -106,6 +106,7 @@ class SmsLogin extends Component {
             }).then(response => {
                 this.setState({ isSendingCode: false })
                 responseRequestValidateCode = response
+                Object.assign(responseRequestValidateCode, { securityCode: stringSecurity })
                 this.props.returnRequestValidateCode(responseRequestValidateCode)
             }).catch(error => {
                 this.setState({ isSendingCode: false })
