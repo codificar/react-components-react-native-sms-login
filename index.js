@@ -309,13 +309,13 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     input: {
-        width: '60%',
+        width: '115%',
         alignSelf: 'center',
         borderBottomWidth: 1,
         marginTop: 25,
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: 16
+        fontSize: 14
     },
     txtDesc: {
         fontFamily: 'Roboto',
