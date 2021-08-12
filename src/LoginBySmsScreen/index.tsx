@@ -1,13 +1,16 @@
 import React, { Component } from 'react'
+import { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, TextInput } from 'react-native'
 import { TextInputMask } from 'react-native-masked-text'
 import axios from 'axios'
+import { PropsSmsLogin } from '../../types'
+
 
 class SmsLogin extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            placeholderText: this.props.placeholderText,
+            placeholderText: this.propsSmsLogin.placeholderText,
             buttonConfirmText: this.props.buttonConfirmText,
             buttonColor: this.props.buttonColor ? this.props.buttonColor : '#6EB986',
             secCodeLenght: this.props.secCodeLenght,
@@ -15,7 +18,7 @@ class SmsLogin extends Component {
             buttonSendText: this.props.buttonSendText,
             codeSentTitle: this.props.codeSentTitle,
             routeSendNumber: this.props.routeSendNumber,
-            routSendSecCode: this.props.routSendSecCode,
+            routeSendSecCode: this.props.routeSendSecCode,
             showMaskPhone: this.props.showMaskPhone ? this.props.showMaskPhone : false,
 
             countryArea: this.props.countryArea ? this.props.countryArea : '+55',
@@ -29,9 +32,9 @@ class SmsLogin extends Component {
             isFocusedCellPhoneNumber: false,
             emptyNumber: null,
 
-			environment: this.props.environment ? this.props.environment : 'provider',
-			deviceType: this.props.deviceType ? this.props.deviceType : null,
-			deviceToken: this.props.deviceToken ? this.props.deviceToken : null
+            environment: this.props.environment ? this.props.environment : 'provider',
+            deviceType: this.props.deviceType ? this.props.deviceType : null,
+            deviceToken: this.props.deviceToken ? this.props.deviceToken : null
         }
     }
 
@@ -62,9 +65,9 @@ class SmsLogin extends Component {
             //console.log('formattedNumberCell: ', formattedNumberCell)
             if (this.props.routeSendNumber !== '') {
                 axios.get(this.props.routeSendNumber, {
-					params: {
-                    	phone: formattedNumberCell
-					}
+                    params: {
+                        phone: formattedNumberCell
+                    }
                 }).then(response => {
                     this.setState({ isSendingCode: false })
                     responseRequestSendSms = response.data
@@ -72,7 +75,7 @@ class SmsLogin extends Component {
                     if (responseRequestSendSms.success == true && responseRequestSendSms.login == true) {
                         this.setState({ showInputSecCode: true })
                         //console.log('responseRequest.provider_id: ', responseRequestSendSms.provider_id)
-						this.setState({ providerId: responseRequestSendSms.provider_id })
+                        this.setState({ providerId: responseRequestSendSms.provider_id })
                     }
                     Object.assign(responseRequestSendSms, { cellPhoneNumber: formattedNumberCell })
                     this.props.returnRequestSendSms(responseRequestSendSms)
@@ -93,7 +96,7 @@ class SmsLogin extends Component {
         }
     }
 
-	cellphoneValidationForUser() {
+    cellphoneValidationForUser() {
         if (this.state.cellPhoneNumber !== '') {
             this.setState({ isSendingCode: true })
 
@@ -121,7 +124,7 @@ class SmsLogin extends Component {
                     responseRequestSendSms = error
                     this.props.returnRequestSendSms(responseRequestSendSms)
                 })
-            } 
+            }
         } else {
             this.setState({ emptyNumber: true })
         }
@@ -133,12 +136,12 @@ class SmsLogin extends Component {
         let stringSecurity = this.state.arrayTexts.join('')
         let responseRequestValidateCode = ''
         console.log('Parametros para o login sms: ', this.state.providerId, stringSecurity)
-        if (this.props.routSendSecCode !== '') {
-            axios.get(this.props.routSendSecCode, {
-				params: {
-					provider_id: this.state.providerId,
-					code: stringSecurity
-				}
+        if (this.props.routeSendSecCode !== '') {
+            axios.get(this.props.routeSendSecCode, {
+                params: {
+                    provider_id: this.state.providerId,
+                    code: stringSecurity
+                }
             }).then(response => {
                 this.setState({ isSendingCode: false })
                 responseRequestValidateCode = response
@@ -158,18 +161,18 @@ class SmsLogin extends Component {
         }*/
     }
 
-	validateCodeForUser() {
+    validateCodeForUser() {
         this.setState({ isSendingCode: true })
 
         let stringSecurity = this.state.arrayTexts.join('')
         let responseRequestValidateCode = ''
 
-        if (this.props.routSendSecCode !== '') {
-            axios.post(this.props.routSendSecCode, {
-				user_id: this.state.providerId,
-				code: stringSecurity,
-				device_token: this.state.deviceToken,
-				device_type: this.state.deviceType
+        if (this.props.routeSendSecCode !== '') {
+            axios.post(this.props.routeSendSecCode, {
+                user_id: this.state.providerId,
+                code: stringSecurity,
+                device_token: this.state.deviceToken,
+                device_type: this.state.deviceType
             }).then(response => {
                 this.setState({ isSendingCode: false })
                 responseRequestValidateCode = response
@@ -179,7 +182,7 @@ class SmsLogin extends Component {
                 this.setState({ isSendingCode: false })
                 responseRequestValidateCode = error
             })
-        } 
+        }
     }
 
 
@@ -250,47 +253,47 @@ class SmsLogin extends Component {
                                 <ActivityIndicator color='#ffffff' size="large" />
                             </View>
                         ) : (
-                                <TouchableOpacity style={buttonStyle.button}
-                                    onPress={() => this.state.environment == 'provider' ? this.cellphoneValidation() : this.cellphoneValidationForUser()}>
-                                    <Text style={styles.nextText}>{this.state.buttonSendText}</Text>
-                                </TouchableOpacity>
-                            )}
+                            <TouchableOpacity style={buttonStyle.button}
+                                onPress={() => this.state.environment == 'provider' ? this.cellphoneValidation() : this.cellphoneValidationForUser()}>
+                                <Text style={styles.nextText}>{this.state.buttonSendText}</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 ) : (
-                        <View style={styles.contValidation}>
-                            <Text style={styles.txtCodeSentTitle}>{this.state.codeSentTitle}</Text>
-                            <View style={{ flexDirection: 'row' }}>
-                                {
-                                    this.state.arrayCodeNumbers.map((item, index) =>
-                                        (
-                                            <TextInput style={styles.inputValidationCode}
-                                                maxLength={1}
-                                                keyboardType='numeric'
-                                                key={item}
-                                                value={this.state.arrayTexts[index]}
-                                                onChangeText={(text) => this.nextOrPrevInput(item, text)}
-                                                ref={this[`${item}_ref`]}
-                                                onKeyPress={({ nativeEvent }) => {
-                                                    if (nativeEvent.key === 'Backspace' && this.state.arrayTexts[index] == '') {
-                                                        this.backSpace(item, index)
-                                                    }
-                                                }}
-                                            />
-                                        ))
-                                }
-                            </View>
-                            {this.state.isSendingCode ? (
-                                <View style={buttonStyle.button}>
-                                    <ActivityIndicator color='#ffffff' size="large" />
-                                </View>
-                            ) : (
-                                    <TouchableOpacity style={buttonStyle.button}
-                                        onPress={() => this.state.environment == 'provider' ? this.validateCode() : this.validateCodeForUser()}>
-                                        <Text style={styles.nextText}>{this.state.buttonConfirmText}</Text>
-                                    </TouchableOpacity>
-                                )}
+                    <View style={styles.contValidation}>
+                        <Text style={styles.txtCodeSentTitle}>{this.state.codeSentTitle}</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            {
+                                this.state.arrayCodeNumbers.map((item, index) =>
+                                (
+                                    <TextInput style={styles.inputValidationCode}
+                                        maxLength={1}
+                                        keyboardType='numeric'
+                                        key={item}
+                                        value={this.state.arrayTexts[index]}
+                                        onChangeText={(text) => this.nextOrPrevInput(item, text)}
+                                        ref={this[`${item}_ref`]}
+                                        onKeyPress={({ nativeEvent }) => {
+                                            if (nativeEvent.key === 'Backspace' && this.state.arrayTexts[index] == '') {
+                                                this.backSpace(item, index)
+                                            }
+                                        }}
+                                    />
+                                ))
+                            }
                         </View>
-                    )}
+                        {this.state.isSendingCode ? (
+                            <View style={buttonStyle.button}>
+                                <ActivityIndicator color='#ffffff' size="large" />
+                            </View>
+                        ) : (
+                            <TouchableOpacity style={buttonStyle.button}
+                                onPress={() => this.state.environment == 'provider' ? this.validateCode() : this.validateCodeForUser()}>
+                                <Text style={styles.nextText}>{this.state.buttonConfirmText}</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                )}
             </View>
         )
     }
@@ -298,46 +301,6 @@ class SmsLogin extends Component {
 
 
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fbfbfb'
-    },
-    nextText: {
-        fontFamily: 'Roboto',
-        color: '#ffffff',
-        fontSize: 16
-    },
-    input: {
-        width: '115%',
-        alignSelf: 'center',
-        borderBottomWidth: 1,
-        marginTop: 25,
-        textAlign: 'center',
-        fontWeight: 'bold',
-        fontSize: 14
-    },
-    txtDesc: {
-        fontFamily: 'Roboto',
-        fontSize: 12,
-        color: '#FF5555',
-        marginTop: 5,
-        fontWeight: 'bold'
-    },
-    contValidation: {
-        alignItems: 'center',
-        marginTop: 20
-    },
-    txtCodeSentTitle: {
-        fontFamily: 'Roboto'
-    },
-    inputValidationCode: {
-        borderBottomWidth: 1,
-        borderBottomColor: '#C6CBD4',
-        textAlign: 'center',
-        fontSize: 22,
-        marginLeft: 10
-    },
-})
 
-export default SmsLogin
+
+export default SmsLogin;

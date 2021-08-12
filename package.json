@@ -11,9 +11,13 @@
     "url": "git+https://git.codificar.com.br/react-components/react-native-sms-login"
   },
   "dependencies": {
-    "react-native-masked-text": "^1.9.2",
+    "@react-navigation/native": "^6.0.2",
+    "@types/react": "^17.0.17",
+    "@types/styled-components-react-native": "^5.1.1",
+    "axios": "^0.19.2",
     "react-native-i18n": "^2.0.10",
-    "axios": "^0.19.2"
+    "react-native-masked-text": "^1.9.2",
+    "styled-components": "^5.3.0"
   },
   "author": "Codificar",
   "license": "MIT"
