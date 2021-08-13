@@ -1,4 +1,6 @@
 import styled from "styled-components/native"
+import { StyleSheet } from "react-native";
+import { TextInputMask, TextInputMaskProps } from 'react-native-masked-text'
 
 let buttonColor = '#3F51B5'
 
@@ -11,14 +13,7 @@ export const NextText = styled.Text`
     color: '#ffffff',
     fontSize: 16`;
 
-export const TextInputMasked = styled.TextInput`
-    width: '115%',
-    alignSelf: 'center',
-    borderBottomWidth: 1,
-    marginTop: 25,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 14`;
+
 
 export const TextDesc = styled.Text`
     fontFamily: 'Roboto',
@@ -31,6 +26,7 @@ export const TextDesc = styled.Text`
 export const ContValidation = styled.View`
     alignItems: 'center',
     marginTop: 20`;
+    
 
 export const TextCodeSentTitle = styled.Text`fontFamily: 'Roboto'`;
 
@@ -53,3 +49,16 @@ export const InputValidationCode = styled.TextInput`
     textAlign: 'center',
     fontSize: 22,
     marginLeft: 10`;
+
+    // lib component, not part of the default react library, cant be a styled component.
+    
+    export const OldStyles =StyleSheet.create({
+        TextInputMasked: {
+        width: '115%',
+        alignSelf: 'center',
+        borderBottomWidth: 1,
+        marginTop:25,
+        textAlign: 'center',
+        fontWeight: 'bold' ,
+        fontSize: 14,
+    }})
