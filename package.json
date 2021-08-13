@@ -2,7 +2,8 @@
   "name": "react-native-sms-login",
   "version": "1.0.0",
   "description": "A login using sms component for react native",
-  "main": "index.js",
+  "main": "index.tsx",
+  "types": "types.tsx",
   "scripts": {
     "test": "echo \\\"Error: no test specified\\\" && exit 1"
   },
