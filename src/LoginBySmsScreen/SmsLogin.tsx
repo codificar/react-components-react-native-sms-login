@@ -13,8 +13,9 @@ import axios from 'axios';
 import * as styles from './styles';
 import * as types from '../../types';
 import { useRoute, useNavigation } from '@react-navigation/core';
+import { Ref } from 'react';
 
-const LoginBySms: FC<{
+interface SmsLoginProps {
   placeholderText: string;
   buttonConfirmText: string;
   buttonColor: string;
@@ -27,7 +28,9 @@ const LoginBySms: FC<{
   showMaskPhone: boolean;
   returnRequestSendSms: any;
   returnRequestValidateCode: any;
-}> = (props) => {
+}
+
+const LoginBySms: FC<SmsLoginProps> = ({ ...props }) => {
   const navigation = useNavigation();
   //Props Received from the upper level
   // const [placeholderText, setPlaceholderText] = useState("")
@@ -48,6 +51,8 @@ const LoginBySms: FC<{
 
   //State derived from the inputs
   const [cellPhoneNumber, setCellPhoneNumber] = useState('');
+  const [arrayCodeNumbersRef, setArrayCodeNumbersRef] = useState([]);
+  const [arrayTextsRef, setArrayTextsRef] = useState([]);
   const [arrayCodeNumbers, setArrayCodeNumbers] = useState([]);
   const [arrayTexts, setArrayTexts] = useState([]);
   const [showInputSecCode, setShowInputSecCode] = useState(false);
@@ -63,17 +68,16 @@ const LoginBySms: FC<{
 
   useEffect(() => {
     let arrayAux = [];
+    let arrayAuxRef = [];
     let arrayTextsAux = [];
     for (let i = 0; i < props.secCodeLenght; i++) {
       arrayAux.push(i);
+      arrayAuxRef[i] = { ref: React.createRef() };
       arrayTextsAux.push('');
     }
 
-    arrayAux.forEach((item) => {
-      this[`${item}_ref`] = React.createRef();
-    });
-
     setArrayCodeNumbers(arrayAux);
+    setArrayCodeNumbersRef(arrayAuxRef);
     setArrayTexts(arrayTextsAux);
   });
 
@@ -112,239 +116,242 @@ const LoginBySms: FC<{
             Object.assign(responseRequestSendSms, {
               cellPhoneNumber: formattedNumberCell,
             });
-            props.returnRequestSendSms(responseRequestSendSms);
+            return props.returnRequestSendSms(responseRequestSendSms);
           })
           .catch((error) => {
             setIsSendingCode(false);
             responseRequestSendSms = error;
-            props.returnRequestSendSms(responseRequestSendSms);
+            return props.returnRequestSendSms(responseRequestSendSms);
           });
       } else {
         setEmptyNumber(true);
-      }
-    }
-
-    function cellphoneValidationForUser() {
-      if (cellPhoneNumber !== '') {
-        setIsSendingCode(true);
-        let responseRequestSendSms: types.PropsSmsLoginUserResponse;
-        let formattedNumberCell = cellPhoneNumber;
-        formattedNumberCell = formattedNumberCell
-          .replace('(', '')
-          .replace(')', '')
-          .replace('-', '')
-          .replace(/ /g, '');
-        formattedNumberCell = countryArea + formattedNumberCell;
-
-        if (cellPhoneNumber !== '') {
-          axios
-            .post(props.routeSendNumber, {
-              phone: formattedNumberCell,
-            })
-            .then((response) => {
-              setIsSendingCode(false);
-              responseRequestSendSms = response.data;
-              if (
-                responseRequestSendSms.success == true &&
-                responseRequestSendSms.login == true
-              ) {
-                setShowInputSecCode(true);
-                setProviderId(responseRequestSendSms.user_id);
-              }
-              Object.assign(responseRequestSendSms, {
-                cellPhoneNumber: formattedNumberCell,
-              });
-              props.returnRequestSendSms(responseRequestSendSms);
-            })
-            .catch((error) => {
-              setIsSendingCode(false);
-              responseRequestSendSms = error;
-              props.returnRequestSendSms(responseRequestSendSms);
-            });
-        }
-      } else {
-        setEmptyNumber(true);
-      }
-    }
-
-    //this function provides the validation in the backend when the provider sends a code
-    function validateCode() {
-      setIsSendingCode(true);
-      let stringSecurity = this.state.arrayTexts.join('');
-      let responseRequestValidateCode: types.PropsSmsValidateCodeResponse;
-      console.log(
-        'Parametros para o login sms: ',
-        this.state.providerId,
-        stringSecurity,
-      );
-      if (props.routeSendSecCode !== '') {
-        axios
-          .get(props.routeSendSecCode, {
-            params: {
-              provider_id: providerId,
-              code: stringSecurity,
-            },
-          })
-          .then((response) => {
-            setIsSendingCode(false);
-            responseRequestValidateCode = response.data;
-            Object.assign(responseRequestValidateCode, {
-              securityCode: stringSecurity,
-            });
-            props.returnRequestValidateCode(responseRequestValidateCode);
-          })
-          .catch((error) => {
-            setIsSendingCode(false);
-            responseRequestValidateCode = error;
-            props.returnRequestValidateCode(responseRequestValidateCode);
-          });
-      }
-    }
-
-    //this function provides the validation in the backend when the user sends a code
-    function validateCodeForUser() {
-      setIsSendingCode(true);
-      let stringSecurity = arrayTexts.join('');
-      let responseRequestValidateCode: types.PropsSmsValidateCodeResponse;
-
-      if (props.routeSendSecCode !== '') {
-        axios
-          .post(props.routeSendSecCode, {
-            user_id: providerId,
-            code: stringSecurity,
-            device_token: deviceToken,
-            device_type: deviceType,
-          })
-          .then((response) => {
-            setIsSendingCode(false);
-            responseRequestValidateCode = response.data;
-            Object.assign(responseRequestValidateCode, {
-              securityCode: stringSecurity,
-            });
-            props.returnRequestValidateCode(responseRequestValidateCode);
-          })
-          .catch((error) => {
-            setIsSendingCode(false);
-            responseRequestValidateCode = error;
-            props.returnRequestValidateCode(responseRequestValidateCode);
-          });
-
-        //this function handles the changing of the text input in the view
-        function nextOrPrevInput(item: number, text: string) {
-          let arrayTextAux = [];
-          arrayTextAux = arrayTexts;
-          arrayTextAux[item] = text;
-          setArrayTexts(arrayTextAux);
-          //this.setState({ arrayTexts: arrayTextAux }) weird bit of code
-
-          if (text == '' && item > 0) {
-            this[`${item - 1}_ref`].current.focus();
-            arrayTextAux[item - 1] = '';
-            setArrayTexts(arrayTextAux);
-            //this.setState({ arrayTexts: arrayTextAux }) weirdness again
-          } else if (text !== '' && item < props.secCodeLenght - 1) {
-            this[`${item + 1}_ref`].current.focus();
-          } else if (text == '' && item == 1) {
-            this[`${item - 1}_ref`].current.focus();
-          }
-        }
-        //this function handles the backspace key
-        function backSpace(item, index) {
-          if (index > 0) {
-            let arrayTextAux = arrayTexts;
-            arrayTextAux[index - 1] = '';
-            setArrayTexts(arrayTextAux);
-            //this.setState({ arrayTexts: arrayTextAux }) still strange
-          }
-          if (item > 0) {
-            this[`${item - 1}_ref`].current.focus();
-          }
-        }
-
-        return (
-          <View /*style={styles.container}*/>
-            {!showInputSecCode ? (
-              <View /*style={{ alignItems: 'center' }}*/>
-                <TextInputMask
-                  type={props.showMaskPhone ? 'cel-phone' : 'only-numbers'}
-                  placeholder={props.placeholderText}
-                  style={[
-                    styles.OldStyles.TextInputMasked,
-                    {
-                      borderBottomColor: isFocusedCellPhoneNumber
-                        ? '#6EB986'
-                        : '#6c757d',
-                    },
-                  ]}
-                  value={cellPhoneNumber}
-                  onFocus={() => setIsFocusedCellPhoneNumber(true)}
-                  onBlur={() => setIsFocusedCellPhoneNumber(false)}
-                  onChangeText={(text) => setCellPhoneNumber(text)}
-                />
-                {emptyNumber ? (
-                  <styles.TextDesc>{props.textDescription}</styles.TextDesc>
-                ) : null}
-
-                {isSendingCode ? (
-                  <View>
-                    <styles.ButtonStyled>
-                      <ActivityIndicator color="#ffffff" size="large" />
-                    </styles.ButtonStyled>
-                  </View>
-                ) : (
-                  <styles.ButtonStyled
-                    onPress={() =>
-                      enviroment == 'provider'
-                        ? cellphoneValidation()
-                        : cellphoneValidationForUser()
-                    }>
-                    <styles.NextText>{props.buttonSendText}</styles.NextText>
-                  </styles.ButtonStyled>
-                )}
-              </View>
-            ) : (
-              <styles.ContValidation>
-                <styles.TextCodeSentTitle>Code Sent</styles.TextCodeSentTitle>
-                <View style={{ flexDirection: 'row' }}>
-                  {arrayCodeNumbers.map((item, index) => (
-                    <styles.InputValidationCode
-                      maxLength={1}
-                      keyboardType="numeric"
-                      key={item}
-                      value={arrayTexts[index]}
-                      onChangeText={(text) => nextOrPrevInput(item, text)}
-                      ref={this[`${item}_ref`]}
-                      onKeyPress={({ nativeEvent }) => {
-                        if (
-                          nativeEvent.key === 'Backspace' &&
-                          arrayTexts[index] == ''
-                        ) {
-                          backSpace(item, index);
-                        }
-                      }}></styles.InputValidationCode>
-                  ))}
-                </View>
-                {isSendingCode ? (
-                  <View>
-                    <styles.ButtonStyled>
-                      <ActivityIndicator color="#ffffff" size="large" />
-                    </styles.ButtonStyled>
-                  </View>
-                ) : (
-                  <styles.ButtonStyled
-                    onPress={() =>
-                      enviroment == 'provider'
-                        ? validateCode()
-                        : validateCodeForUser()
-                    }>
-                    <styles.NextText>{props.buttonConfirmText}</styles.NextText>
-                  </styles.ButtonStyled>
-                )}
-              </styles.ContValidation>
-            )}
-          </View>
-        );
       }
     }
   }
+
+  function cellphoneValidationForUser() {
+    if (cellPhoneNumber !== '') {
+      setIsSendingCode(true);
+      let responseRequestSendSms: types.PropsSmsLoginUserResponse;
+      let formattedNumberCell = cellPhoneNumber;
+      formattedNumberCell = formattedNumberCell
+        .replace('(', '')
+        .replace(')', '')
+        .replace('-', '')
+        .replace(/ /g, '');
+      formattedNumberCell = countryArea + formattedNumberCell;
+
+      if (cellPhoneNumber !== '') {
+        axios
+          .post(props.routeSendNumber, {
+            phone: formattedNumberCell,
+          })
+          .then((response) => {
+            setIsSendingCode(false);
+            responseRequestSendSms = response.data;
+            if (
+              responseRequestSendSms.success == true &&
+              responseRequestSendSms.login == true
+            ) {
+              setShowInputSecCode(true);
+              setProviderId(responseRequestSendSms.user_id);
+            }
+            Object.assign(responseRequestSendSms, {
+              cellPhoneNumber: formattedNumberCell,
+            });
+            return props.returnRequestSendSms(responseRequestSendSms);
+          })
+          .catch((error) => {
+            setIsSendingCode(false);
+            responseRequestSendSms = error;
+            return props.returnRequestSendSms(responseRequestSendSms);
+          });
+      }
+    } else {
+      setEmptyNumber(true);
+    }
+  }
+
+  //this function provides the validation in the backend when the provider sends a code
+  function validateCode() {
+    setIsSendingCode(true);
+    let stringSecurity = this.state.arrayTexts.join('');
+    let responseRequestValidateCode: types.PropsSmsValidateCodeResponse;
+    console.log(
+      'Parametros para o login sms: ',
+      this.state.providerId,
+      stringSecurity,
+    );
+    if (props.routeSendSecCode !== '') {
+      axios
+        .get(props.routeSendSecCode, {
+          params: {
+            provider_id: providerId,
+            code: stringSecurity,
+          },
+        })
+        .then((response) => {
+          setIsSendingCode(false);
+          responseRequestValidateCode = response.data;
+          Object.assign(responseRequestValidateCode, {
+            securityCode: stringSecurity,
+          });
+          props.returnRequestValidateCode(responseRequestValidateCode);
+        })
+        .catch((error) => {
+          setIsSendingCode(false);
+          responseRequestValidateCode = error;
+          props.returnRequestValidateCode(responseRequestValidateCode);
+        });
+    }
+  }
+
+  //this function provides the validation in the backend when the user sends a code
+  function validateCodeForUser() {
+    setIsSendingCode(true);
+    let stringSecurity = arrayTexts.join('');
+    let responseRequestValidateCode: types.PropsSmsValidateCodeResponse;
+
+    if (props.routeSendSecCode !== '') {
+      axios
+        .post(props.routeSendSecCode, {
+          user_id: providerId,
+          code: stringSecurity,
+          device_token: deviceToken,
+          device_type: deviceType,
+        })
+        .then((response) => {
+          setIsSendingCode(false);
+          responseRequestValidateCode = response.data;
+          Object.assign(responseRequestValidateCode, {
+            securityCode: stringSecurity,
+          });
+          return props.returnRequestValidateCode(responseRequestValidateCode);
+        })
+        .catch((error) => {
+          setIsSendingCode(false);
+          responseRequestValidateCode = error;
+          return props.returnRequestValidateCode(responseRequestValidateCode);
+        });
+    }
+  }
+
+  //this function handles the changing of the text input in the view
+  //   function nextOrPrevInput(item: React.RefObject<any>, text: string) {
+  //     let arrayTextAux = [];
+  //     arrayTextAux = arrayTexts;
+  //     arrayTextAux[item] = text;
+  //     setArrayTexts(arrayTextAux);
+  //     //this.setState({ arrayTexts: arrayTextAux }) weird bit of code
+
+  //     if (text == '' && item > 0) {
+  //       item.ref.current.focus();
+  //       arrayTextAux[item - 1] = '';
+  //       setArrayTexts(arrayTextAux);
+  //       //this.setState({ arrayTexts: arrayTextAux }) weirdness again
+  //     } else if (text !== '' && item < props.secCodeLenght - 1) {
+  //       this[`${item + 1}_ref`].current.focus();
+  //     } else if (text == '' && item == 1) {
+  //       this[`${item - 1}_ref`].current.focus();
+  //     }
+  //   }
+
+  //this function handles the backspace key
+  function backSpace(item, index) {
+    if (index > 0) {
+      let arrayTextAux = arrayTexts;
+      arrayTextAux[index - 1] = '';
+      setArrayTexts(arrayTextAux);
+      //this.setState({ arrayTexts: arrayTextAux }) still strange
+    }
+    if (item > 0) {
+      this[`${item - 1}_ref`].current.focus();
+    }
+  }
+
+  return (
+    <View /*style={styles.container}*/>
+      {!showInputSecCode ? (
+        <View /*style={{ alignItems: 'center' }}*/>
+          <TextInputMask
+            type={props.showMaskPhone ? 'cel-phone' : 'only-numbers'}
+            placeholder={props.placeholderText}
+            style={[
+              styles.OldStyles.TextInputMasked,
+              {
+                borderBottomColor: isFocusedCellPhoneNumber
+                  ? '#6EB986'
+                  : '#6c757d',
+              },
+            ]}
+            value={cellPhoneNumber}
+            onFocus={() => setIsFocusedCellPhoneNumber(true)}
+            onBlur={() => setIsFocusedCellPhoneNumber(false)}
+            onChangeText={(text) => setCellPhoneNumber(text)}
+          />
+          {emptyNumber ? (
+            <styles.TextDesc>{props.textDescription}</styles.TextDesc>
+          ) : null}
+
+          {isSendingCode ? (
+            <View>
+              <styles.ButtonStyled>
+                <ActivityIndicator color="#ffffff" size="large" />
+              </styles.ButtonStyled>
+            </View>
+          ) : (
+            <styles.ButtonStyled
+              onPress={() =>
+                enviroment == 'provider'
+                  ? cellphoneValidation()
+                  : cellphoneValidationForUser()
+              }>
+              <styles.NextText>{props.buttonSendText}</styles.NextText>
+            </styles.ButtonStyled>
+          )}
+        </View>
+      ) : (
+        <styles.ContValidation>
+          <styles.TextCodeSentTitle>Code Sent</styles.TextCodeSentTitle>
+          <View style={{ flexDirection: 'row' }}>
+            {arrayCodeNumbers.map((item, index) => (
+              <styles.InputValidationCode
+                maxLength={1}
+                keyboardType="numeric"
+                key={item}
+                value={arrayTexts[index]}
+                onChangeText={(text) => console.log(text)}
+                ref={item.ref}
+                onKeyPress={({ nativeEvent }) => {
+                  if (
+                    nativeEvent.key === 'Backspace' &&
+                    arrayTexts[index] == ''
+                  ) {
+                    backSpace(item, index);
+                  }
+                }}></styles.InputValidationCode>
+            ))}
+          </View>
+          {isSendingCode ? (
+            <View>
+              <styles.ButtonStyled>
+                <ActivityIndicator color="#ffffff" size="large" />
+              </styles.ButtonStyled>
+            </View>
+          ) : (
+            <styles.ButtonStyled
+              onPress={() =>
+                enviroment == 'provider'
+                  ? validateCode()
+                  : validateCodeForUser()
+              }>
+              <styles.NextText>{props.buttonConfirmText}</styles.NextText>
+            </styles.ButtonStyled>
+          )}
+        </styles.ContValidation>
+      )}
+    </View>
+  );
 };
+
+export default LoginBySms;
