@@ -2,7 +2,7 @@ import styled from "styled-components/native"
 import { StyleSheet } from "react-native";
 import { TextInputMask, TextInputMaskProps } from 'react-native-masked-text'
 
-let buttonColor = '#3f515'
+let buttonColor = '#3f5105'
 
 export const Container = styled.View`
 flex: 1;
@@ -40,15 +40,14 @@ export const ButtonStyled = styled.TouchableOpacity`
         alignSelf: 'center',
         marginBottom: 10,
         bottom: 15,
-        marginTop: 100
-    `;
+        marginTop: 100,`;
 
 export const InputValidationCode = styled.TextInput`
     borderBottomWidth: 1,
     borderBottomColor: '#c6cbd4',
     textAlign: 'center',
     fontSize: 22,
-    marginLeft: 10`;
+    marginLeft: 10,`;
 
     // lib component, not part of the default react library, cant be a styled component.
     
