@@ -26,8 +26,7 @@ interface SmsLoginProps {
   routeSendNumber: string;
   routeSendSecCode: string;
   showMaskPhone: boolean;
-  returnRequestSendSms: any;
-  returnRequestValidateCode: any;
+  returnRequest: any;
 }
 
 const LoginBySms: FC<SmsLoginProps> = ({ ...props }) => {
@@ -116,12 +115,12 @@ const LoginBySms: FC<SmsLoginProps> = ({ ...props }) => {
             Object.assign(responseRequestSendSms, {
               cellPhoneNumber: formattedNumberCell,
             });
-            return props.returnRequestSendSms(responseRequestSendSms);
+            return props.returnRequest(responseRequestSendSms);
           })
           .catch((error) => {
             setIsSendingCode(false);
             responseRequestSendSms = error;
-            return props.returnRequestSendSms(responseRequestSendSms);
+            return props.returnRequest(responseRequestSendSms);
           });
       } else {
         setEmptyNumber(true);
@@ -159,12 +158,12 @@ const LoginBySms: FC<SmsLoginProps> = ({ ...props }) => {
             Object.assign(responseRequestSendSms, {
               cellPhoneNumber: formattedNumberCell,
             });
-            return props.returnRequestSendSms(responseRequestSendSms);
+            return props.returnRequest(responseRequestSendSms);
           })
           .catch((error) => {
             setIsSendingCode(false);
             responseRequestSendSms = error;
-            return props.returnRequestSendSms(responseRequestSendSms);
+            return props.returnRequest(responseRequestSendSms);
           });
       }
     } else {
@@ -196,12 +195,12 @@ const LoginBySms: FC<SmsLoginProps> = ({ ...props }) => {
           Object.assign(responseRequestValidateCode, {
             securityCode: stringSecurity,
           });
-          props.returnRequestValidateCode(responseRequestValidateCode);
+          props.returnRequest(responseRequestValidateCode);
         })
         .catch((error) => {
           setIsSendingCode(false);
           responseRequestValidateCode = error;
-          props.returnRequestValidateCode(responseRequestValidateCode);
+          props.returnRequest(responseRequestValidateCode);
         });
     }
   }
@@ -226,12 +225,12 @@ const LoginBySms: FC<SmsLoginProps> = ({ ...props }) => {
           Object.assign(responseRequestValidateCode, {
             securityCode: stringSecurity,
           });
-          return props.returnRequestValidateCode(responseRequestValidateCode);
+          return props.returnRequest(responseRequestValidateCode);
         })
         .catch((error) => {
           setIsSendingCode(false);
           responseRequestValidateCode = error;
-          return props.returnRequestValidateCode(responseRequestValidateCode);
+          return props.returnRequest(responseRequestValidateCode);
         });
     }
   }
