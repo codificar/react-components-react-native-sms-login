@@ -77,7 +77,7 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
     setArrayCodeNumbers(arrayAux);
     setArrayCodeNumbersRef(arrayAuxRef);
     setArrayTexts(arrayTextsAux);
-  });
+  }, []);
 
   //This function provides the validation in the backend of the cellphone of the provider
   function cellphoneValidation() {
