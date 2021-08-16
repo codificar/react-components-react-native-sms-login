@@ -2,7 +2,7 @@ import styled from "styled-components/native"
 import { StyleSheet } from "react-native";
 import { TextInputMask, TextInputMaskProps } from 'react-native-masked-text'
 
-let buttonColor = '#3F51B5'
+let buttonColor = '#3f515'
 
 export const Container = styled.View`
 flex: 1;
@@ -18,7 +18,7 @@ export const NextText = styled.Text`
 export const TextDesc = styled.Text`
     fontFamily: 'Roboto',
     fontSize: 12,
-    color: '#FF5555',
+    color: '#ff5555',
     marginTop: 5,
     fontWeight: 'bold'
 `;
@@ -45,7 +45,7 @@ export const ButtonStyled = styled.TouchableOpacity`
 
 export const InputValidationCode = styled.TextInput`
     borderBottomWidth: 1,
-    borderBottomColor: '#C6CBD4',
+    borderBottomColor: '#c6cbd4',
     textAlign: 'center',
     fontSize: 22,
     marginLeft: 10`;
