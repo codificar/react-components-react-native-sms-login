@@ -60,10 +60,10 @@ const LoginBySms: FC<SmsLoginProps> = ({ ...props }) => {
     useState(false);
   const [emptyNumber, setEmptyNumber] = useState(null);
 
-  //State brought from the cellphone storage
-  const [enviroment, setEnviroment] = useState('provider');
-  const [deviceType, setDeviceType] = useState(null);
-  const [deviceToken, setDeviceToken] = useState(null);
+  //State brought from the App with the Navigation property
+  const [app_type, setEnviroment] = useState('provider'); //Props needed to determine the type of action
+  const [deviceType, setDeviceType] = useState(null); //Prop needed to determine the device type (ios or android)
+  const [deviceToken, setDeviceToken] = useState(null); //Prop needed to determine the device token
 
   useEffect(() => {
     let arrayAux = [];
@@ -301,7 +301,7 @@ const LoginBySms: FC<SmsLoginProps> = ({ ...props }) => {
           ) : (
             <styles.ButtonStyled
               onPress={() =>
-                enviroment == 'provider'
+                app_type == 'provider'
                   ? cellphoneValidation()
                   : cellphoneValidationForUser()
               }>
@@ -340,9 +340,7 @@ const LoginBySms: FC<SmsLoginProps> = ({ ...props }) => {
           ) : (
             <styles.ButtonStyled
               onPress={() =>
-                enviroment == 'provider'
-                  ? validateCode()
-                  : validateCodeForUser()
+                app_type == 'provider' ? validateCode() : validateCodeForUser()
               }>
               <styles.NextText>{props.buttonConfirmText}</styles.NextText>
             </styles.ButtonStyled>
