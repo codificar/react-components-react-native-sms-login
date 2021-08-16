@@ -1,5 +1,3 @@
-import { AxiosResponse } from 'axios';
-
 export type PropsSmsLogin = {
   placeholderText: string;
   buttonConfirmText: string;
