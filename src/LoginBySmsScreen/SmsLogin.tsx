@@ -29,7 +29,7 @@ interface SmsLoginProps {
   returnRequest: any;
 }
 
-const LoginBySms: FC<SmsLoginProps> = ({ ...props }) => {
+const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
   const navigation = useNavigation();
   //Props Received from the upper level
   // const [placeholderText, setPlaceholderText] = useState("")
@@ -351,4 +351,4 @@ const LoginBySms: FC<SmsLoginProps> = ({ ...props }) => {
   );
 };
 
-export default LoginBySms;
+export default LoginBySmsScreen;
