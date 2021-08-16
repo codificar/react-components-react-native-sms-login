@@ -30,7 +30,6 @@ interface SmsLoginProps {
 }
 
 const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
-  const navigation = useNavigation();
   //Props Received from the upper level
   // const [placeholderText, setPlaceholderText] = useState("")
   // const [buttonConfirmText, setButtonConfirmText] = useState('')
