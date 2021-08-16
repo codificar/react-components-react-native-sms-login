@@ -1,1 +1,3 @@
-export { default as LoginBySmsScreen } from './SmsLogin';
+import LoginBySmsScreen from './SmsLogin';
+
+export default LoginBySmsScreen;

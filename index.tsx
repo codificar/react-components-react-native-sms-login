@@ -1,4 +1,4 @@
-import { LoginBySmsScreen } from './src/LoginBySmsScreen/index';
+import LoginBySmsScreen from './src/LoginBySmsScreen/index';
 export * from './src/types/navigation';
 
 export type {
