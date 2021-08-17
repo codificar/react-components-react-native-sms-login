@@ -42,8 +42,8 @@ interface SmsLoginProps {
 const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
   //State derived from the response of the sent number
   const [countryArea, setCountryArea] = useState('+55');
-  const [providerId, setProviderId] = useState(null);
-  const [userId, setUserId] = useState(null);
+  const [providerId, setProviderId] = useState(0);
+  const [userId, setUserId] = useState(0);
 
   //State derived from the inputs
   const [cellPhoneNumber, setCellPhoneNumber] = useState('');
@@ -56,7 +56,7 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isFocusedCellPhoneNumber, setIsFocusedCellPhoneNumber] =
     useState(false);
-  const [emptyNumber, setEmptyNumber] = useState(null);
+  const [emptyNumber, setEmptyNumber] = useState(false);
 
   useEffect(() => {
     let arrayAux = [];
@@ -269,7 +269,7 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
               styles.OldStyles.TextInputMasked,
               {
                 borderBottomColor: isFocusedCellPhoneNumber
-                  ? '#6EB986'
+                  ? '#6eb986'
                   : '#6c757d',
               },
             ]}
@@ -311,7 +311,7 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
                 styles.OldStyles.TextInputMasked,
                 {
                   borderBottomColor: isFocusedCellPhoneNumber
-                    ? '#6EB986'
+                    ? '#6eb986'
                     : '#6c757d',
                 },
               ]}
