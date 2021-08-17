@@ -137,6 +137,7 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
           })
           .then((response) => {
             setIsSendingCode(false);
+            setUserId(response.data.user_id);
             responseRequestSendSms = response.data;
             if (
               responseRequestSendSms.success == true &&
@@ -306,9 +307,18 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
           <View style={{ flexDirection: 'column' }}>
             <TextInput
               maxLength={props.secCodeLenght}
-              style={styles.OldStyles.TextInputMasked}
+              style={[
+                styles.OldStyles.TextInputMasked,
+                {
+                  borderBottomColor: isFocusedCellPhoneNumber
+                    ? '#6EB986'
+                    : '#6c757d',
+                },
+              ]}
               keyboardType="numeric"
               value={secCode}
+              onFocus={() => setIsFocusedCellPhoneNumber(true)}
+              onBlur={() => setIsFocusedCellPhoneNumber(false)}
               onChangeText={(text) => onSecCodeChange(text)}
               onKeyPress={({ nativeEvent }) => {
                 if (nativeEvent.key === 'Backspace' && secCode == null) {
