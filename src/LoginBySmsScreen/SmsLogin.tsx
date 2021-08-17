@@ -303,9 +303,10 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
           <styles.TextCodeSentTitle>
             {props.condeSentTitle}
           </styles.TextCodeSentTitle>
-          <View style={{ flexDirection: 'row' }}>
+          <View style={{ flexDirection: 'column' }}>
             <TextInput
               maxLength={props.secCodeLenght}
+              style={styles.OldStyles.TextInputMasked}
               keyboardType="numeric"
               value={secCode}
               onChangeText={(text) => onSecCodeChange(text)}

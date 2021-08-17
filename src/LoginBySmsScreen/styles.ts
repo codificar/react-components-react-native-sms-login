@@ -51,12 +51,12 @@ export const InputValidationCode = styled.TextInput`
 
 export const OldStyles = StyleSheet.create({
     TextInputMasked: {
-        width: '115%',
+        width: '60%',
         alignSelf: 'center',
         borderBottomWidth: 1,
         marginTop: 25,
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: 14,
+        fontSize: 16,
     }
 })
