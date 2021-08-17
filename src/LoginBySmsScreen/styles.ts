@@ -22,9 +22,9 @@ export const TextDesc = styled.Text`
 `;
 
 export const ContValidation = styled.View`
-    alignItems: enter;
+    alignItems: center;
     marginTop: 20;`;
-    
+
 
 export const TextCodeSentTitle = styled.Text`fontFamily: Roboto;`;
 
@@ -47,15 +47,16 @@ export const InputValidationCode = styled.TextInput`
     fontSize: 22;
     marginLeft: 10;`;
 
-    // lib component, not part of the default react library, cant be a styled component.
-    
-    export const OldStyles =StyleSheet.create({
-        TextInputMasked: {
+// lib component, not part of the default react library, cant be a styled component.
+
+export const OldStyles = StyleSheet.create({
+    TextInputMasked: {
         width: '115%',
         alignSelf: 'center',
         borderBottomWidth: 1,
-        marginTop:25,
+        marginTop: 25,
         textAlign: 'center',
-        fontWeight: 'bold' ,
+        fontWeight: 'bold',
         fontSize: 14,
-    }})
+    }
+})
