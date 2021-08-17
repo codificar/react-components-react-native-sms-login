@@ -16,6 +16,9 @@ import { useRoute, useNavigation } from '@react-navigation/core';
 import { Ref } from 'react';
 
 interface SmsLoginProps {
+  deviceType: string;
+  deviceToken: string;
+  app_type: string;
   placeholderText: string;
   buttonConfirmText: string;
   buttonColor: string;
@@ -26,22 +29,17 @@ interface SmsLoginProps {
   routeSendNumber: string;
   routeSendSecCode: string;
   showMaskPhone: boolean;
-  returnRequest: any;
+  returnRequest: {
+    (
+      data:
+        | types.PropsSmsLoginUserResponse
+        | types.PropsSmsLoginProviderResponse
+        | types.PropsSmsValidateCodeResponse,
+    ): void;
+  };
 }
 
 const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
-  //Props Received from the upper level
-  // const [placeholderText, setPlaceholderText] = useState("")
-  // const [buttonConfirmText, setButtonConfirmText] = useState('')
-  // const [buttonColor, setButtonColor] = useState('')
-  // const [secCodeLenght, setSecCodeLenght] = useState(0)
-  // const [textDescription, setTextDescription] = useState('')
-  // const [buttonSendtext, setButtonSendText] = useState('')
-  // const [codeSentTitle, setCodeSentTitle] = useState('')
-  // const [routeSendNumber, setRouteSendNumber] = useState(''),
-  // const [routeSendSecCode, setRouteSendSecCode] = useState(''),
-  // const [showMaskPhone, setShowMaskPhone] = useState(false),
-
   //State derived from the response of the sent number
   const [countryArea, setCountryArea] = useState('+55');
   const [providerId, setProviderId] = useState(null);
@@ -49,38 +47,31 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
 
   //State derived from the inputs
   const [cellPhoneNumber, setCellPhoneNumber] = useState('');
-  const [arrayCodeNumbersRef, setArrayCodeNumbersRef] = useState([]);
-  const [arrayTextsRef, setArrayTextsRef] = useState([]);
+  // const [arrayCodeNumbersRef, setArrayCodeNumbersRef] = useState([]);
+  // const [arrayTextsRef, setArrayTextsRef] = useState([]);
   const [arrayCodeNumbers, setArrayCodeNumbers] = useState([]);
   const [arrayTexts, setArrayTexts] = useState([]);
   const [showInputSecCode, setShowInputSecCode] = useState(false);
+  const [secCode, setSecCode] = useState('');
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [isFocusedCellPhoneNumber, setIsFocusedCellPhoneNumber] =
     useState(false);
   const [emptyNumber, setEmptyNumber] = useState(null);
 
-  //State brought from the App with the Navigation property
-  const [app_type, setEnviroment] = useState('provider'); //Props needed to determine the type of action
-  const [deviceType, setDeviceType] = useState(null); //Prop needed to determine the device type (ios or android)
-  const [deviceToken, setDeviceToken] = useState(null); //Prop needed to determine the device token
-
   useEffect(() => {
     let arrayAux = [];
-    let arrayAuxRef = [];
     let arrayTextsAux = [];
     for (let i = 0; i < props.secCodeLenght; i++) {
       arrayAux.push(i);
-      arrayAuxRef[i] = { ref: React.createRef() };
       arrayTextsAux.push('');
     }
 
     setArrayCodeNumbers(arrayAux);
-    setArrayCodeNumbersRef(arrayAuxRef);
     setArrayTexts(arrayTextsAux);
   }, []);
 
   //This function provides the validation in the backend of the cellphone of the provider
-  function cellphoneValidation() {
+  function cellphoneValidationForProvider() {
     if (cellPhoneNumber !== '') {
       setIsSendingCode(true);
       let responseRequestSendSms: types.PropsSmsLoginProviderResponse;
@@ -152,7 +143,7 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
               responseRequestSendSms.login == true
             ) {
               setShowInputSecCode(true);
-              setProviderId(responseRequestSendSms.user_id);
+              setUserId(responseRequestSendSms.user_id);
             }
             Object.assign(responseRequestSendSms, {
               cellPhoneNumber: formattedNumberCell,
@@ -171,15 +162,11 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
   }
 
   //this function provides the validation in the backend when the provider sends a code
-  function validateCode() {
+  function validateCodeForProvider() {
     setIsSendingCode(true);
     let stringSecurity = this.state.arrayTexts.join('');
     let responseRequestValidateCode: types.PropsSmsValidateCodeResponse;
-    console.log(
-      'Parametros para o login sms: ',
-      this.state.providerId,
-      stringSecurity,
-    );
+    console.log('Parametros para o login sms: ', providerId, stringSecurity);
     if (props.routeSendSecCode !== '') {
       axios
         .get(props.routeSendSecCode, {
@@ -207,16 +194,16 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
   //this function provides the validation in the backend when the user sends a code
   function validateCodeForUser() {
     setIsSendingCode(true);
-    let stringSecurity = arrayTexts.join('');
+    let stringSecurity = secCode;
     let responseRequestValidateCode: types.PropsSmsValidateCodeResponse;
 
     if (props.routeSendSecCode !== '') {
       axios
         .post(props.routeSendSecCode, {
-          user_id: providerId,
+          user_id: userId,
           code: stringSecurity,
-          device_token: deviceToken,
-          device_type: deviceType,
+          device_token: props.deviceToken,
+          device_type: props.deviceType,
         })
         .then((response) => {
           setIsSendingCode(false);
@@ -233,39 +220,42 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
         });
     }
   }
-
-  //this function handles the changing of the text input in the view
-  //   function nextOrPrevInput(item: React.RefObject<any>, text: string) {
-  //     let arrayTextAux = [];
-  //     arrayTextAux = arrayTexts;
-  //     arrayTextAux[item] = text;
-  //     setArrayTexts(arrayTextAux);
-  //     //this.setState({ arrayTexts: arrayTextAux }) weird bit of code
-
-  //     if (text == '' && item > 0) {
-  //       item.ref.current.focus();
-  //       arrayTextAux[item - 1] = '';
-  //       setArrayTexts(arrayTextAux);
-  //       //this.setState({ arrayTexts: arrayTextAux }) weirdness again
-  //     } else if (text !== '' && item < props.secCodeLenght - 1) {
-  //       this[`${item + 1}_ref`].current.focus();
-  //     } else if (text == '' && item == 1) {
-  //       this[`${item - 1}_ref`].current.focus();
-  //     }
-  //   }
-
-  //this function handles the backspace key
-  function backSpace(item, index) {
-    if (index > 0) {
-      let arrayTextAux = arrayTexts;
-      arrayTextAux[index - 1] = '';
-      setArrayTexts(arrayTextAux);
-      //this.setState({ arrayTexts: arrayTextAux }) still strange
-    }
-    if (item > 0) {
-      this[`${item - 1}_ref`].current.focus();
-    }
+  function onSecCodeChange(code) {
+    setSecCode(code);
+    return console.log(code);
   }
+  // //this function handles the changing of the text input in the view
+  // function nextOrPrevInput(item: React.RefObject<any>, text: string) {
+  //   let arrayTextAux = [];
+  //   arrayTextAux = arrayTexts;
+  //   arrayTextAux[item] = text;
+  //   setArrayTexts(arrayTextAux);
+  //   //this.setState({ arrayTexts: arrayTextAux }) weird bit of code
+
+  //   if (text == '' && item > 0) {
+  //     item.ref.current.focus();
+  //     arrayTextAux[item - 1] = '';
+  //     setArrayTexts(arrayTextAux);
+  //     //this.setState({ arrayTexts: arrayTextAux }) weirdness again
+  //   } else if (text !== '' && item < props.secCodeLenght - 1) {
+  //     this[`${item + 1}_ref`].current.focus();
+  //   } else if (text == '' && item == 1) {
+  //     this[`${item - 1}_ref`].current.focus();
+  //   }
+  // }
+
+  // //this function handles the backspace key
+  // function backSpace(item, index) {
+  //   if (index > 0) {
+  //     let arrayTextAux = arrayTexts;
+  //     arrayTextAux[index - 1] = '';
+  //     setArrayTexts(arrayTextAux);
+  //     //this.setState({ arrayTexts: arrayTextAux }) still strange
+  //   }
+  //   if (item > 0) {
+  //     this[`${item - 1}_ref`].current.focus();
+  //   }
+  // }
 
   return (
     <View /*style={styles.container}*/>
@@ -300,8 +290,8 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
           ) : (
             <styles.ButtonStyled
               onPress={() =>
-                app_type == 'provider'
-                  ? cellphoneValidation()
+                props.app_type == 'provider'
+                  ? cellphoneValidationForProvider()
                   : cellphoneValidationForUser()
               }>
               <styles.NextText>{props.buttonSendText}</styles.NextText>
@@ -310,25 +300,21 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
         </View>
       ) : (
         <styles.ContValidation>
-          <styles.TextCodeSentTitle>Code Sent</styles.TextCodeSentTitle>
+          <styles.TextCodeSentTitle>
+            {props.condeSentTitle}
+          </styles.TextCodeSentTitle>
           <View style={{ flexDirection: 'row' }}>
-            {arrayCodeNumbers.map((item, index) => (
-              <styles.InputValidationCode
-                maxLength={1}
-                keyboardType="numeric"
-                key={item}
-                value={arrayTexts[index]}
-                onChangeText={(text) => console.log(text)}
-                ref={item.ref}
-                onKeyPress={({ nativeEvent }) => {
-                  if (
-                    nativeEvent.key === 'Backspace' &&
-                    arrayTexts[index] == ''
-                  ) {
-                    backSpace(item, index);
-                  }
-                }}></styles.InputValidationCode>
-            ))}
+            <TextInput
+              maxLength={props.secCodeLenght}
+              keyboardType="numeric"
+              value={secCode}
+              onChangeText={(text) => onSecCodeChange(text)}
+              onKeyPress={({ nativeEvent }) => {
+                if (nativeEvent.key === 'Backspace' && secCode == null) {
+                  setShowInputSecCode(false);
+                }
+              }}
+            />
           </View>
           {isSendingCode ? (
             <View>
@@ -339,7 +325,9 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
           ) : (
             <styles.ButtonStyled
               onPress={() =>
-                app_type == 'provider' ? validateCode() : validateCodeForUser()
+                props.app_type == 'provider'
+                  ? validateCodeForProvider()
+                  : validateCodeForUser()
               }>
               <styles.NextText>{props.buttonConfirmText}</styles.NextText>
             </styles.ButtonStyled>
