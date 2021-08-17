@@ -57,6 +57,9 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
   const [isFocusedCellPhoneNumber, setIsFocusedCellPhoneNumber] =
     useState(false);
   const [emptyNumber, setEmptyNumber] = useState(false);
+  const axiosConfigForValidation = {
+    headers: { 'Content-Type': 'multipart/form-data;' },
+  };
 
   useEffect(() => {
     let arrayAux = [];
@@ -137,7 +140,6 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
           })
           .then((response) => {
             setIsSendingCode(false);
-            setUserId(response.data.user_id);
             responseRequestSendSms = response.data;
             if (
               responseRequestSendSms.success == true &&
@@ -201,10 +203,14 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
 
     if (props.routeSendSecCode !== '') {
       axios
-        .post(props.routeSendSecCode, {
-          user_id: userId,
-          code: stringSecurity,
-        })
+        .post(
+          props.routeSendSecCode,
+          {
+            user_id: userId,
+            code: stringSecurity,
+          },
+          axiosConfigForValidation,
+        )
         .then((response) => {
           setIsSendingCode(false);
           responseRequestValidateCode = response.data;
