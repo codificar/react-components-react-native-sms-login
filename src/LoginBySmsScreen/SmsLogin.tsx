@@ -203,8 +203,6 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
         .post(props.routeSendSecCode, {
           user_id: userId,
           code: stringSecurity,
-          device_token: props.deviceToken,
-          device_type: props.deviceType,
         })
         .then((response) => {
           setIsSendingCode(false);
