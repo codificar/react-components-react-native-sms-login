@@ -43,7 +43,7 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
   //State derived from the response of the sent number
   const [countryArea, setCountryArea] = useState('+55');
   const [providerId, setProviderId] = useState(0);
-  const [userId, setUserId] = useState(0);
+  const [userId, setUserId] = useState('');
 
   //State derived from the inputs
   const [cellPhoneNumber, setCellPhoneNumber] = useState('');
@@ -144,7 +144,8 @@ const LoginBySmsScreen: FC<SmsLoginProps> = ({ ...props }) => {
               responseRequestSendSms.login == true
             ) {
               setShowInputSecCode(true);
-              setUserId(responseRequestSendSms.user_id);
+              let stringifiedUserId = responseRequestSendSms.user_id.toString();
+              setUserId(stringifiedUserId);
             }
             Object.assign(responseRequestSendSms, {
               cellPhoneNumber: formattedNumberCell,
