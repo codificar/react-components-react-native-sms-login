@@ -18,7 +18,7 @@ class SmsLogin extends Component {
             routSendSecCode: this.props.routSendSecCode,
             showMaskPhone: this.props.showMaskPhone ? this.props.showMaskPhone : false,
 
-            countryArea: this.props.countryArea ? this.props.countryArea : '+55',
+            countryArea: this.getCountryArea(),
             providerId: null,
 
             cellPhoneNumber: '',
@@ -35,6 +35,84 @@ class SmsLogin extends Component {
         }
     }
 
+    /**
+     * Get country area code based on nationality
+     */
+    getCountryArea() {
+        const nationality = this.props.nationality || 'pt-br';
+        
+        switch (nationality.toLowerCase()) {
+            case 'pt-ao':
+            case 'ao':
+                return '+244'; // Angola
+            case 'pt-br':
+            case 'br':
+                return '+55'; // Brasil
+            case 'es-py':
+            case 'py':
+                return '+595'; // Paraguai
+            default:
+                return '+55'; // Default to Brasil
+        }
+    }
+
+    /**
+     * Get phone mask type based on nationality
+     */
+    getPhoneMaskType() {
+        const nationality = this.props.nationality || 'pt-br';
+        
+        switch (nationality.toLowerCase()) {
+            case 'pt-ao':
+            case 'ao':
+                return 'custom'; // Custom mask for Angola
+            case 'pt-br':
+            case 'br':
+            case 'es-py':
+            case 'py':
+            default:
+                return 'cel-phone'; // Brazilian/Paraguayan phone mask
+        }
+    }
+
+    /**
+     * Get phone mask options based on nationality
+     */
+    getPhoneMaskOptions() {
+        const nationality = this.props.nationality || 'pt-br';
+        
+        switch (nationality.toLowerCase()) {
+            case 'pt-ao':
+            case 'ao':
+                // Angola: custom mask for 999 999 999 format
+                return {
+                    mask: '999 999 999'
+                };
+            case 'pt-br':
+            case 'br':
+                // Brazil: (99) 99999-9999 format
+                return {
+                    maskType: 'BRL',
+                    withDDD: true,
+                    dddMask: '(99) '
+                };
+            case 'es-py':
+            case 'py':
+                // Paraguay: (99) 99999-9999 format
+                return {
+                    maskType: 'BRL',
+                    withDDD: true,
+                    dddMask: '(99) '
+                };
+            default:
+                // Default to Brazil format
+                return {
+                    maskType: 'BRL',
+                    withDDD: true,
+                    dddMask: '(99) '
+                };
+        }
+    }
 
     componentDidMount() {
         let arrayAux = []
@@ -79,6 +157,7 @@ class SmsLogin extends Component {
                 }).catch(error => {
                     this.setState({ isSendingCode: false })
                     responseRequestSendSms = error
+                    console.log('responseRequestSendSms: ', responseRequestSendSms)
                     this.props.returnRequestSendSms(responseRequestSendSms)
                 })
             } /*else {
@@ -233,13 +312,14 @@ class SmsLogin extends Component {
                 {!this.state.showInputSecCode ? (
                     <View /*style={{ alignItems: 'center' }}*/>
                         <TextInputMask
-                            type={this.state.showMaskPhone ? 'cel-phone' : 'only-numbers'}
+                            type={this.getPhoneMaskType()}
                             placeholder={this.state.placeholderText}
                             style={[styles.input, { borderBottomColor: this.state.isFocusedCellPhoneNumber ? '#6EB986' : '#6c757d' }]}
                             value={this.state.cellPhoneNumber}
-                            onFocus={() => this.setState(this.setState({ isFocusedCellPhoneNumber: true }))}
+                            onFocus={() => this.setState({ isFocusedCellPhoneNumber: true })}
                             onBlur={() => this.setState({ isFocusedCellPhoneNumber: false })}
                             onChangeText={text => this.setState({ cellPhoneNumber: text })}
+                            options={this.getPhoneMaskOptions()}
                         />
                         {this.state.emptyNumber ? (
                             <Text style={styles.txtDesc}>{this.state.textDescription}</Text>
